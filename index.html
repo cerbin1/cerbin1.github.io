@@ -23,10 +23,14 @@
     var numberOfBombs = 10;
     var isGameDone = false;
     var colors = ["blue", "green", "red", "purple", "orange", "pink"];
-    var cells = fillTwoDimensionalArray();
-    createBorderTable();
-    plantBombs();
-    createPicture();
+    var cells;
+
+    function startGame() {
+        cells = fillTwoDimensionalArray();
+        createBorderTable();
+        plantBombs();
+        createPicture();
+    }
 
 
 
@@ -34,7 +38,7 @@
         var image = document.createElement("img");
         image.src = "baby.png";
         image.setAttribute("class", "picture");
-        image.setAttribute("onclick", "location.reload()");
+        image.setAttribute("onclick", "startGame()");
         document.body.appendChild(image);
     }
 
