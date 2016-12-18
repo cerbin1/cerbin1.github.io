@@ -10,6 +10,7 @@
 <button class="new-game-button" onclick="startGame()">Start new game</button>
     <label for="width"></label><input type="number" id="width">
     <label for="length"></label><input type="number" id="length">
+    <label for="bombs"></label><input type="number" id="bombs">
 
 <button id="d"></button>
 <!--<script>
@@ -22,7 +23,7 @@
 <script>
     var width;
     var length;
-    var numberOfBombs = 10;
+    var numberOfBombs;
     var isGameDone = false;
     var colors = ["blue", "green", "red", "purple", "orange", "pink"];
     var cells;
@@ -30,6 +31,7 @@
     function startGame() {
         width = document.getElementById("width").value;
         length = document.getElementById("length").value;
+        numberOfBombs = document.getElementById("bombs").value;
         cells = fillTwoDimensionalArray();
         createBorderTable();
         plantBombs();
@@ -106,7 +108,7 @@
                 isBombAdjacentToField(i, j);
             }
         }
-        displayAllBombs();
+//        displayAllBombs();
     }
 
     function isBombAdjacentToField(x, y) {
