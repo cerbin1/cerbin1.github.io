@@ -33,7 +33,6 @@
         cells = fillTwoDimensionalArray();
         createBorderTable();
         plantBombs();
-        createPicture();
     }
 
 
@@ -230,7 +229,11 @@
     }
 
     function floodFill(x, y) {
-        if (y < 0 || y > width - 1 || x < 0 || x > length - 1 || cells[x][y].isFlag || cells[x][y].isBomb) {
+        if (y < 0 || y > width - 1 || x < 0 || x > length - 1) {
+            return;
+        }
+
+        if(cells[x][y].isFlag || cells[x][y].isBomb) {
             return;
         }
 
