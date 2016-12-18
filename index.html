@@ -27,9 +27,9 @@
     var cells;
 
     function startGame() {
-        width = document.getElementById("width").value;
-        length = document.getElementById("length").value;
-        numberOfBombs = document.getElementById("numberOfBombs").value;
+        width = parseInt(document.getElementById("width").value);
+        length = parseInt(document.getElementById("length").value);
+        numberOfBombs = parseInt(document.getElementById("numberOfBombs").value);
         cells = fillTwoDimensionalArray();
         createBorderTable();
         plantBombs();
@@ -229,11 +229,7 @@
     }
 
     function floodFill(x, y) {
-        if (y < 0 || y > width - 1 || x < 0 || x > length - 1) {
-            return;
-        }
-
-        if(cells[x][y].isFlag || cells[x][y].isBomb) {
+        if (y < 0 || y > width - 1 || x < 0 || x > length - 1 || cells[x][y].isFlag || cells[x][y].isBomb) {
             return;
         }
 
