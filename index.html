@@ -8,9 +8,9 @@
 <body>
 
 <button class="new-game-button" onclick="startGame()">Start new game</button>
+<label for="numberOfBombs"></label><input type="number" id="numberOfBombs">
     <label for="width"></label><input type="number" id="width">
     <label for="length"></label><input type="number" id="length">
-    <label for="bombs"></label><input type="number" id="bombs">
 <!--<script>
     var d = document.getElementById("d");
     d.addEventListener("click", function () {
@@ -29,7 +29,7 @@
     function startGame() {
         width = document.getElementById("width").value;
         length = document.getElementById("length").value;
-        numberOfBombs = document.getElementById("bombs").value;
+        numberOfBombs = document.getElementById("numberOfBombs").value;
         cells = fillTwoDimensionalArray();
         createBorderTable();
         plantBombs();
