@@ -8,6 +8,10 @@
 <body>
 
 <button class="new-game-button" onclick="startGame()">Start new game</button>
+<form>
+    <input type="number" id="width">
+    <input type="number" id="length">
+</form>
 
 <button id="d"></button>
 <!--<script>
@@ -26,6 +30,8 @@
     var cells;
 
     function startGame() {
+        width = document.getElementById("width");
+        length = document.getElementById("length");
         cells = fillTwoDimensionalArray();
         createBorderTable();
         plantBombs();
