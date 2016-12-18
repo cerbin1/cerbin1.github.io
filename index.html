@@ -28,8 +28,8 @@
     var cells;
 
     function startGame() {
-//        width = parseInt(document.getElementById("width"));
-//        length = parseInt(document.getElementById("length"));
+        width = document.getElementById("width").value;
+        length = document.getElementById("length").value;
         cells = fillTwoDimensionalArray();
         createBorderTable();
         plantBombs();
