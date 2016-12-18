@@ -18,26 +18,39 @@
 </script>-->
 
 <script>
-    var numberOfBombs = 9;
+    var width = 10;
+    var length = 10;
+    var numberOfBombs = 10;
     var isGameDone = false;
     var colors = ["blue", "green", "red", "purple", "orange", "pink"];
-    var bombsAndFlags = fillTwoDimensionalArray();
+    var cells = fillTwoDimensionalArray();
     createBorderTable();
     plantBombs();
+    createPicture();
+
+
+
+    function createPicture() {
+        var image = document.createElement("img");
+        image.src = "baby.png";
+        image.setAttribute("class", "picture");
+        image.setAttribute("onclick", "location.reload()");
+        document.body.appendChild(image);
+    }
 
     function fillTwoDimensionalArray() {
-        function getDefaultFieldObject() {
-            return {isBomb: false, isFlag: false, numberOfBombsAdjacent: 0, gameField: null};
-        }
-
         var array = [];
-        for (var i = 0; i < 9; i++) {
+        for (var i = 0; i < width; i++) {
             array[i] = [];
-            for (var j = 0; j < 9; j++) {
+            for (var j = 0; j < length; j++) {
                 array[i][j] = getDefaultFieldObject();
             }
         }
         return array;
+    }
+
+    function getDefaultFieldObject() {
+        return {isBomb: false, isFlag: false, numberOfBombsAdjacent: 0, gameField: null, isCellDiscovered: false};
     }
 
     function createBorderTable() {
@@ -49,17 +62,18 @@
         table.setAttribute("id", "gameBoard");
         gameDiv.appendChild(table);
 
-        for (var i = 0; i < 9; i++) {
+        for (var i = 0; i < width; i++) {
             var row = document.createElement("tr");
             row.setAttribute("id", "row" + i.toString());
             table.appendChild(row);
 
-            for (var j = 0; j < 9; j++) {
+            for (var j = 0; j < length; j++) {
                 var cell = document.createElement("td");
-                cell.setAttribute("id", i.toString() + j.toString());
                 cell.setAttribute("onmousedown", "playerMove(event, this)");
-                document.getElementById("row" + i.toString()).appendChild(cell);
-                bombsAndFlags[i][j].gameField = cell;
+                cell.setAttribute("data-x", i.toString());
+                cell.setAttribute("data-y", j.toString());
+                row.appendChild(cell);
+                cells[i][j].gameField = cell;
             }
         }
     }
@@ -67,12 +81,10 @@
     function plantBombs() {
         for (var i = 0; i < numberOfBombs; i++) {
             while (true) {
-                var first = Math.floor(Math.random() * bombsAndFlags.length);
-                var second = Math.floor(Math.random() * bombsAndFlags.length);
-                if (!bombsAndFlags[first][second].isBomb) {
-                    bombsAndFlags[first][second].isBomb = true;
-                    console.log(first, second);
-                    console.log(bombsAndFlags[first][second].isBomb);
+                var x = Math.floor(Math.random() * cells.length);
+                var y = Math.floor(Math.random() * cells.length);
+                if (!cells[x][y].isBomb) {
+                    cells[x][y].isBomb = true;
                     break;
                 }
             }
@@ -81,40 +93,40 @@
     }
 
     function countBombsAdjacentToFields() {
-        for (var i = 0; i < bombsAndFlags.length; i++) {
-            for (var j = 0; j < bombsAndFlags.length; j++) {
+        for (var i = 0; i < cells.length; i++) {
+            for (var j = 0; j < cells[i].length; j++) {
                 isBombAdjacentToField(i, j);
             }
         }
+        displayAllBombs();
     }
 
     function isBombAdjacentToField(x, y) {
-        function incrementNumberOfBombsAdjacentToField() {
-            bombsAndFlags[x][y].numberOfBombsAdjacent++;
-        }
-
         for (var i = -1; i < 2; i++) {
             for (var j = -1; j < 2; j++) {
-                if (x + i >= 0 && x + i <= 8 && y + j >= 0 && y + j <= 8) {
-                    if (bombsAndFlags[x + i][y + j].isBomb) {
-                        incrementNumberOfBombsAdjacentToField();
+                if (x + i >= 0 && x + i <= width - 1 && y + j >= 0 && y + j <= length - 1) {
+                    if (cells[x + i][y + j].isBomb) {
+                        incrementNumberOfBombsAdjacentToField(x, y);
                     }
                 }
             }
         }
     }
 
+    function incrementNumberOfBombsAdjacentToField(x, y) {
+        cells[x][y].numberOfBombsAdjacent++;
+    }
+
     function playerMove(event, object) {
         if (!isGameDone) {
-            var x = parseInt(object.id.charAt(0)); // zrobić z tego dwa atrybuty data-x oraz data-y
-            var y = parseInt(object.id.charAt(1));
-            var divToChange = bombsAndFlags[x][y].gameField;
+            var x = parseInt(object.getAttribute("data-x"));
+            var y = parseInt(object.getAttribute("data-y"));
 
             if (event.button == 0) {
-                discoverField(x, y, divToChange);
+                discoverField(x, y, cells[x][y]);
             }
             if (event.button == 2) {
-                setFlag(x, y, divToChange);
+                setFlag(cells[x][y]);
             }
             checkIfPlayerWins();
         }
@@ -123,70 +135,69 @@
         }
     }
 
-    function discoverField(x, y, gameField) {
-        console.log("x: " + x + " y: " + y);
-        console.log(bombsAndFlags[x][y].isBomb);
-        if (!bombsAndFlags[x][y].isFlag) {
-            if (bombsAndFlags[x][y].isBomb == true) {
-                displayAllBombs();
-                console.log("Przegrales");
-                isGameDone = true;
-            } else {
-                if (bombsAndFlags[x][y].numberOfBombsAdjacent > 0) {
-                    gameField.innerText = bombsAndFlags[x][y].numberOfBombsAdjacent;
-                    gameField.style.color = colorNumberOfBombs(bombsAndFlags[x][y].numberOfBombsAdjacent);
-                    gameField.style.backgroundColor = "darkGray";
+    function discoverField(x, y, cellToDiscover) {
+        if (!cellToDiscover.isFlag) {
+            if (!cellToDiscover.isCellDiscovered) {
+                if (cellToDiscover.isBomb) {
+                    displayAllBombs();
+                    console.log("Przegrales");
+                    isGameDone = true;
                 } else {
-                    floodFill(x, y, gameField);
+                    if (cellToDiscover.numberOfBombsAdjacent > 0) {
+                        cellToDiscover.gameField.innerText = cellToDiscover.numberOfBombsAdjacent;
+                        cellToDiscover.gameField.style.color = colorNumberOfBombs(cellToDiscover.numberOfBombsAdjacent);
+                        cellToDiscover.gameField.style.backgroundColor = "darkGray";
+                        cellToDiscover.isCellDiscovered = true;
+                    } else {
+                        floodFill(x, y);
+                    }
                 }
             }
+        }
+    }
+
+    function setFlag(cellToSetFlag) {
+        var flagImage = document.createElement("img");
+        if (!cellToSetFlag.isCellDiscovered) {
+            if (cellToSetFlag.isFlag) {
+                cellToSetFlag.gameField.innerHTML = "";
+                flagImage.src = "";
+                cellToSetFlag.isFlag = false;
+            } else {
+                flagImage.src = "flag.png";
+                cellToSetFlag.isFlag = true;
+            }
+            cellToSetFlag.gameField.appendChild(flagImage);
         }
     }
 
     function displayAllBombs() {
-        for (var i = 0; i < bombsAndFlags.length; i++) {
-            for (var j = 0; j < bombsAndFlags.length; j++) {
-                if (bombsAndFlags[i][j].isBomb) {
-                    bombsAndFlags[i][j].gameField.style.backgroundColor = "red";
+        for (var i = 0; i < cells.length; i++) {
+            for (var j = 0; j < cells[i].length; j++) {
+                if (cells[i][j].isBomb) {
+                    cells[i][j].gameField.style.backgroundColor = "red";
                 }
-            }
-        }
-    }
-
-    function setFlag(x, y, fieldToSetFlag) {
-        var flagImage = document.createElement("img");
-        if (fieldToSetFlag.style.backgroundColor != "darkgray") {
-            if (bombsAndFlags[x][y].isFlag) {
-                fieldToSetFlag.innerHTML = "";
-                flagImage.src = "";
-                fieldToSetFlag.appendChild(flagImage);
-                bombsAndFlags[x][y].isFlag = false;
-            } else {
-                flagImage.src = "flag.png";
-                fieldToSetFlag.appendChild(flagImage);
-                bombsAndFlags[x][y].isFlag = true;
             }
         }
     }
 
     function checkIfPlayerWins() {
-        if (countPointsFromFlags() == numberOfBombs || countPointsFromFieldsReleased() == 0) {
+        if (countPointsFromFlags() == numberOfBombs || countFieldsUndiscovered() == 0) {
             console.log("wygrales");
             isGameDone = true;
         } else {
-            console.log("nie wygrales jeszcze");
-            console.log("punkty z flag: " + countPointsFromFlags() + " punkty z pol " + countPointsFromFieldsReleased());
+            console.log("punkty z flag: " + countPointsFromFlags() + " punkty z pol " + countFieldsUndiscovered());
         }
     }
 
     function countPointsFromFlags() {
         var numberOfPoints = 0;
-        for (var i = 0; i < 9; i++) {
-            for (var j = 0; j < 9; j++) {
-                if (bombsAndFlags[i][j].isBomb && bombsAndFlags[i][j].isFlag) {
+        for (var i = 0; i < width; i++) {
+            for (var j = 0; j < length; j++) {
+                if (cells[i][j].isBomb && cells[i][j].isFlag) {
                     numberOfPoints++;
                 }
-                if (!bombsAndFlags[i][j].isBomb && bombsAndFlags[i][j].isFlag) {
+                if (!cells[i][j].isBomb && cells[i][j].isFlag) {
                     numberOfPoints--;
                 }
             }
@@ -194,17 +205,16 @@
         return numberOfPoints;
     }
 
-    function countPointsFromFieldsReleased() {
-        var numberOfPoints = 0;
-        for (var i = 0; i < 9; i++) {
-            for (var j = 0; j < 9; j++) {
-                var isDarkGray = document.getElementById(i.toString() + j.toString()).style.backgroundColor === "darkgray";
-                if (!bombsAndFlags[i][j].isBomb && !isDarkGray) {
-                    numberOfPoints++;
+    function countFieldsUndiscovered() {
+        var numberOfUndiscoveredFields = 0;
+        for (var i = 0; i < width; i++) {
+            for (var j = 0; j < length; j++) {
+                if (!cells[i][j].isBomb && !cells[i][j].isCellDiscovered) {
+                    numberOfUndiscoveredFields++;
                 }
             }
         }
-        return numberOfPoints;
+        return numberOfUndiscoveredFields;
     }
 
     function colorNumberOfBombs(numberOfBombs) {
@@ -212,26 +222,26 @@
     }
 
     function floodFill(x, y) {
-        if (y < 0 || y > 8 || x < 0 || x > 8 || bombsAndFlags[x][y].isFlag || bombsAndFlags[x][y].isBomb) {
-            console.log("border exceeded");
+        if (y < 0 || y > width - 1 || x < 0 || x > length - 1 || cells[x][y].isFlag || cells[x][y].isBomb) {
             return;
         }
 
-        var gameFieldToChange = bombsAndFlags[x][y].gameField;
+        var cell = cells[x][y];
 
-        if (gameFieldToChange.style.backgroundColor == "darkgray") {
-            console.log("already clicked");
+        if (cell.isCellDiscovered) {
             return;
         }
 
-        if (bombsAndFlags[x][y].numberOfBombsAdjacent > 0) {
-            gameFieldToChange.innerHTML = bombsAndFlags[x][y].numberOfBombsAdjacent.toString();
-            gameFieldToChange.style.color = colorNumberOfBombs(bombsAndFlags[x][y].numberOfBombsAdjacent);
-            gameFieldToChange.style.backgroundColor = "darkGray";
+        if (cell.numberOfBombsAdjacent > 0) {
+            cell.gameField.innerHTML = cell.numberOfBombsAdjacent.toString();
+            cell.gameField.style.color = colorNumberOfBombs(cell.numberOfBombsAdjacent);
+            cell.gameField.style.backgroundColor = "darkGray";
+            cell.isCellDiscovered = true;
             return;
         }
         else {
-            gameFieldToChange.style.backgroundColor = "darkGray";
+            cell.gameField.style.backgroundColor = "darkGray";
+            cell.isCellDiscovered = true;
         }
 
         for (var i = -1; i < 2; i++) {
