@@ -43,3 +43,8 @@ input {
     margin: 5px 5px;
     text-align: center;
 }
+
+.sizeOfImage {
+    width: 30px;
+    height: 28px;
+}
