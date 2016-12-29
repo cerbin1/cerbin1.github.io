@@ -48,3 +48,8 @@ input {
     width: 30px;
     height: 28px;
 }
+
+#messageBox {
+    font-size: 20px;
+    text-align: center;
+}
