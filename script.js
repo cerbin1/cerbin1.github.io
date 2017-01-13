@@ -1,40 +1,129 @@
-var gameBoard = {width: 0, height: 0, cells: null, numberOfFlaggedFields: 0, iterateCells: cellsIterator};
-var game = {numberOfBombs: 0, isGameDone: false, isFirstClick: true, isBoardGenerated: false, messageBox: null};
-var colorsOfNumberOfBombsAdjacentToField = ["blue", "green", "red", "purple", "orange", "yellow", "brown", "pink"];
+var game = {
+    numberOfBombs: 0,
+    isGameDone: false,
+    isFirstClick: true,
+    messageBox: null,
+    createBoard: function () {
+        this.board.numberOfFlaggedFields = 0;
+        this.isGameDone = false;
+        this.isFirstClick = true;
+        this.board.cells = createGameBoard();
+        createBorderTable();
+        plantBombs();
+    },
+    gameField: null,
+    createGameDiv: function () {
+        this.gameField = document.createElement("div");
+        this.gameField.setAttribute("id", "gameDiv");
+        this.gameField.setAttribute("oncontextmenu", "return false");
+        document.body.appendChild(this.gameField);
+    },
 
-function cellsIterator(callback) {
-    for (var i = 0; i < gameBoard.height; i++) {
-        for (var j = 0; j < gameBoard.width; j++) {
-            var cell = gameBoard.cells[i][j];
-            callback(cell);
+    createMessageBox: function () {
+        var divToDisplayMessages = document.createElement("div");
+        divToDisplayMessages.setAttribute("id", "messageBox");
+        document.getElementById("gameDiv").appendChild(divToDisplayMessages);
+        this.messageBox = document.getElementById("messageBox");
+    },
+    clearBoard: function () {
+        this.messageBox.innerHTML = "";
+        this.gameField.innerHTML = "";
+    },
+    board: {
+        width: 0,
+        height: 0,
+        cells: null,
+        numberOfFlaggedFields: 0,
+        iterateCells: function (callback) {
+            for (var i = 0; i < this.height; i++) {
+                for (var j = 0; j < this.width; j++) {
+                    var cell = this.cells[i][j];
+                    callback(cell);
+                }
+            }
+        },
+        isWidthProperly: function () {
+            return (this.width >= 1 && this.width <= 50) && (Math.round(this.width) == this.width);
+        },
+        isHeightProperly: function () {
+            return (this.height >= 1 && this.height <= 50) && (Math.round(this.height) == this.height);
+        },
+        bombsConditions: function () {
+            return game.numberOfBombs == Math.round(game.numberOfBombs) && game.numberOfBombs >= 0 && game.numberOfBombs < this.height * this.width;
+        },
+        countBombsAdjacentToFields: function () {
+            for (var i = 0; i < this.height; i++) {
+                for (var j = 0; j < this.width; j++) {
+                    this.isBombAdjacentToField(i, j);
+                }
+            }
+        },
+        isBombAdjacentToField: function (x, y) {
+            for (var i = -1; i < 2; i++) {
+                for (var j = -1; j < 2; j++) {
+                    if (this.isFieldInBoard(x + i, y + j)) {
+                        if (this.cells[x + i][y + j].isBomb) {
+                            this.incrementNumberOfBombsAdjacentToField(x, y);
+                        }
+                    }
+                }
+            }
+        },
+        isFieldInBoard: function (x, y) {
+            return (0 <= x && x < this.height) && (0 <= y && y < this.width);
+        },
+        incrementNumberOfBombsAdjacentToField: function (x, y) {
+            this.cells[x][y].numberOfBombsAdjacent++;
+        },
+
+        countUndiscoveredFields: function () {
+            var numberOfUndiscoveredFields = 0;
+
+            this.iterateCells(function (cell) {
+                if (!cell.isBomb && !cell.isDiscovered) {
+                    numberOfUndiscoveredFields++;
+                }
+            });
+
+            return numberOfUndiscoveredFields;
         }
     }
-}
+};
+var colorsOfNumberOfBombsAdjacentToField = ["blue", "green", "red", "purple", "orange", "yellow", "brown", "pink"];
 
 function startGame() {
-    if (game.isBoardGenerated) {
-        var gameDiv = document.getElementById("gameDiv");
-        gameDiv.parentNode.removeChild(gameDiv);
+    if (game.gameField != null) {
+        game.clearBoard();
     }
-    game.numberOfBombs = document.getElementById("bombs").value;
-    gameBoard.width = document.getElementById("width").value;
-    gameBoard.height = document.getElementById("height").value;
-    gameBoard.numberOfFlaggedFields = 0;
-    game.isGameDone = false;
-    game.isFirstClick = true;
-    gameBoard.cells = fillTwoDimensionalArray();
-    createBorderTable();
-    plantBombs();
-    game.isBoardGenerated = true;
 
-    createMessageBox();
+    game.board.width = document.getElementById("width").value;
+    game.board.height = document.getElementById("height").value;
+    game.numberOfBombs = document.getElementById("bombs").value;
+    if (game.board.isWidthProperly()) {
+        if (game.board.isHeightProperly()) {
+            if (game.board.bombsConditions()) {
+                game.createGameDiv();
+                game.createBoard();
+                game.createMessageBox();
+            }
+            else {
+                alert("Podałeś niepoprawną liczbę bomb!");
+            }
+        }
+        else {
+            alert("Wysokość niepoprawna (Powinna być wartość od 1 do 50)!");
+        }
+    }
+    else {
+        alert("Szerokość niepoprawna (Powinna być wartość od 1 do 50)!");
+    }
 }
 
-function fillTwoDimensionalArray() {
+function createGameBoard() {
     var array = [];
-    for (var i = 0; i < gameBoard.height; i++) {
+    for (var i = 0; i < game.board.height; i++) {
         array[i] = [];
-        for (var j = 0; j < gameBoard.width; j++) {
+        for (var j = 0; j < game.board.width; j++) {
             array[i][j] = getDefaultFieldObject();
         }
     }
@@ -58,101 +147,61 @@ function getDefaultFieldObject() {
 }
 
 function createBorderTable() {
-    var gameDiv = document.createElement("div");
-    gameDiv.setAttribute("id", "gameDiv");
-    gameDiv.setAttribute("oncontextmenu", "return false");
-    document.body.appendChild(gameDiv);
-
     var table = document.createElement("table");
-    table.setAttribute("id", "gameBoard");
-    gameDiv.appendChild(table);
+    table.setAttribute("id", "game.board");
+    game.gameField.appendChild(table);
 
-    for (var i = 0; i < gameBoard.height; i++) {
+    for (var i = 0; i < game.board.height; i++) {
         var row = document.createElement("tr");
         row.setAttribute("id", "row" + i.toString());
         table.appendChild(row);
 
-        for (var j = 0; j < gameBoard.width; j++) {
+        for (var j = 0; j < game.board.width; j++) {
             var cell = document.createElement("td");
             cell.addEventListener("click", leftMouseClick);
             cell.addEventListener("contextmenu", rightMouseClick);
             cell.dataset.x = i.toString();
             cell.dataset.y = j.toString();
             row.appendChild(cell);
-            gameBoard.cells[i][j].gameField = cell;
+            game.board.cells[i][j].gameField = cell;
         }
     }
 }
 
 function plantBombs() {
     for (var i = 0; i < game.numberOfBombs; i++) {
-        plantSingleBomb();
+        plantRandomBomb();
     }
-    countBombsAdjacentToFields();
 }
 
-function plantSingleBomb() {
+function plantRandomBomb() {
     while (true) {
-        var x = Math.floor(Math.random() * gameBoard.height);
-        var y = Math.floor(Math.random() * gameBoard.width);
-        if (!gameBoard.cells[x][y].isBomb) {
-            gameBoard.cells[x][y].isBomb = true;
+        var x = Math.floor(Math.random() * game.board.height);
+        var y = Math.floor(Math.random() * game.board.width);
+        if (!game.board.cells[x][y].isBomb) {
+            game.board.cells[x][y].isBomb = true;
             break;
         }
     }
 }
 
-function countBombsAdjacentToFields() {
-    for (var i = 0; i < gameBoard.height; i++) {
-        for (var j = 0; j < gameBoard.width; j++) {
-            isBombAdjacentToField(i, j);
-        }
-    }
-}
-
-function isBombAdjacentToField(x, y) {
-    for (var i = -1; i < 2; i++) {
-        for (var j = -1; j < 2; j++) {
-            if (isFieldInBoard(x + i, y + j)) {
-                if (gameBoard.cells[x + i][y + j].isBomb) {
-                    incrementNumberOfBombsAdjacentToField(x, y);
-                }
-            }
-        }
-    }
-}
-
-function isFieldInBoard(x, y) {
-    return (0 <= x && x < gameBoard.height) && (0 <= y && y < gameBoard.width);
-}
-
-function incrementNumberOfBombsAdjacentToField(x, y) {
-    gameBoard.cells[x][y].numberOfBombsAdjacent++;
-}
 
 function displayAllBombs() {
-    for (var i = 0; i < gameBoard.height; i++) {
-        for (var j = 0; j < gameBoard.width; j++) {
-            var cellToChange = gameBoard.cells[i][j];
+    for (var i = 0; i < game.board.height; i++) {
+        for (var j = 0; j < game.board.width; j++) {
+            var cellToChange = game.board.cells[i][j];
             if (cellToChange.isBomb) {
                 if (cellToChange.isFlag) {
                     cellToChange.gameField.innerHTML = "";
                     cellToChange.gameField.style.backgroundColor = "lightGreen";
                 }
                 else {
-                    cellToChange.gameField.style.backgroundColor = "	#FF4500";
+                    cellToChange.gameField.style.backgroundColor = "#FF4500";//TODO add red color only when player lose, otherwise, set all bombs background color on green
                 }
                 cellToChange.changeFieldToBomb();
             }
         }
     }
-}
-
-function createMessageBox() {
-    var divToDisplayMessages = document.createElement("div");
-    divToDisplayMessages.setAttribute("id", "messageBox");
-    document.getElementById("gameDiv").appendChild(divToDisplayMessages);
-    game.messageBox = document.getElementById("messageBox");
 }
 
 function leftMouseClick() {
@@ -162,12 +211,13 @@ function leftMouseClick() {
         var x = parseInt(this.dataset.x);
         var y = parseInt(this.dataset.y);
 
-        var cell = gameBoard.cells[x][y];
+        var cell = game.board.cells[x][y];
         if (game.isFirstClick) {
             if (cell.isBomb) {
-                plantSingleBomb();
+                plantRandomBomb();
                 cell.isBomb = false;
             }
+            game.board.countBombsAdjacentToFields();
             game.isFirstClick = false;
         }
 
@@ -184,7 +234,7 @@ function rightMouseClick() {
         var x = parseInt(this.dataset.x);
         var y = parseInt(this.dataset.y);
 
-        setFlag(gameBoard.cells[x][y]);
+        setFlag(game.board.cells[x][y]);
         checkIfPlayerWins();
     }
 }
@@ -225,7 +275,7 @@ function floodFill(x, y) {
         return;
     }
 
-    var cell = gameBoard.cells[x][y];
+    var cell = game.board.cells[x][y];
 
     if (isEmptyOrDiscovered(cell)) {
         return;
@@ -241,7 +291,7 @@ function floodFill(x, y) {
 }
 
 function isFieldOutsideBoard(x, y) {
-    return (0 > y || y >= gameBoard.width) || (0 > x || x >= gameBoard.height);
+    return (0 > y || y >= game.board.width) || (0 > x || x >= game.board.height);
 }
 
 function isEmptyOrDiscovered(cell) {
@@ -269,20 +319,20 @@ function recursiveFloodFill(x, y) {
 }
 
 function checkIfPlayerWins() {
-    if (isThereEnoughPointsForWin()) {
+    if (winCondition()) {
         displayAllBombs();
         game.messageBox.innerHTML = "Wygrałeś!!!";
         game.isGameDone = true;
     }
 }
 
-function isThereEnoughPointsForWin() {
-    return countPointsFromFlags() == game.numberOfBombs || countFieldsUndiscovered() == 0;
+function winCondition() {
+    return countFlagPoints() == game.numberOfBombs || game.board.countUndiscoveredFields() == 0;
 }
 
-function countPointsFromFlags() {
+function countFlagPoints() {
     var numberOfPoints = 0;
-    gameBoard.iterateCells(function (cell) {
+    game.board.iterateCells(function (cell) {
         if (cell.isFlag) {
             if (cell.isBomb) {
                 numberOfPoints++;
@@ -300,7 +350,7 @@ function countPointsFromFlags() {
 
 function allFieldsDiscovered() {
     var allDiscovered = true;
-    gameBoard.iterateCells(function (cell) {
+    game.board.iterateCells(function (cell) {
         if (!cell.isDiscovered) {
             allDiscovered = false;
         }
@@ -308,18 +358,6 @@ function allFieldsDiscovered() {
     return allDiscovered;
 }
 
-function countFieldsUndiscovered() {
-    var numberOfUndiscoveredFields = 0;
-    for (var i = 0; i < gameBoard.height; i++) {
-        for (var j = 0; j < gameBoard.width; j++) {
-            var cell = gameBoard.cells[i][j];
-            if (!cell.isBomb && !cell.isDiscovered) {
-                numberOfUndiscoveredFields++;
-            }
-        }
-    }
-    return numberOfUndiscoveredFields;
-}
 
 function setFlag(cellToSetFlag) {
     if (cellToSetFlag.isDiscovered) {
@@ -328,14 +366,14 @@ function setFlag(cellToSetFlag) {
     if (cellToSetFlag.isFlag) {
         cellToSetFlag.gameField.innerHTML = "";
         cellToSetFlag.isFlag = false;
-        gameBoard.numberOfFlaggedFields--;
+        game.board.numberOfFlaggedFields--;
     } else {
         var flagImage = document.createElement("img");
         flagImage.setAttribute("class", "sizeOfImage");
         flagImage.src = "flag.png";
         cellToSetFlag.isFlag = true;
-        gameBoard.numberOfFlaggedFields++;
+        game.board.numberOfFlaggedFields++;
         cellToSetFlag.gameField.appendChild(flagImage);
     }
-    game.messageBox.innerHTML = "Pozostalo bomb: " + (game.numberOfBombs - gameBoard.numberOfFlaggedFields);
+    game.messageBox.innerHTML = "Pozostalo bomb: " + (game.numberOfBombs - game.board.numberOfFlaggedFields);
 }

@@ -7,13 +7,17 @@ table {
     margin: 0 auto;
 }
 
-td{
+td {
     text-align: center;
     border: 1px solid black;
     width: 30px;
     height: 30px;
     cursor: pointer;
     font-size: 20px;
+}
+
+td:hover {
+    background-color: darkgrey;
 }
 
 .endLineDiv {
@@ -23,9 +27,6 @@ td{
 .field {
     float: left;
     margin: 0 auto;
-}
-td:hover {
-    background-color: darkgrey;
 }
 
 .new-game-button {
