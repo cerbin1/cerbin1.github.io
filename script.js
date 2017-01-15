@@ -49,7 +49,7 @@ var game = {
             return (this.height >= 1 && this.height <= 50) && (Math.round(this.height) == this.height);
         },
         bombsConditions: function () {
-            return game.numberOfBombs == Math.round(game.numberOfBombs) || game.numberOfBombs >= 0 || game.numberOfBombs < this.height * this.width;
+            return game.numberOfBombs == Math.round(game.numberOfBombs) && game.numberOfBombs >= 0 && game.numberOfBombs < this.height * this.width;
         },
         countBombsAdjacentToFields: function () {
             for (var i = 0; i < this.height; i++) {
