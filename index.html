@@ -1,26 +1,83 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.4/vue.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <meta charset="UTF-8">
-    <title>Minesweeper</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    <title>Vue</title>
 </head>
-<body onload="startGame()">
-<div style="width: 50%; margin: 0 auto; text-align: center">
-    <label>
-        Bomby<input id="bombs" type="number" min="1" max="2499" value="10">
-    </label>
+<body>
+<div id="main">
+    <form class="form-inline">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input v-model="name" class="form-control" id="name" placeholder="Name">
+        </div>
+        <div class="form-group">
+            <label for="surname">Surname</label>
+            <input v-model="surname" class="form-control" id="surname" placeholder="Surname">
+        </div>
+    </form>
+
+    <p>Siema {{ name + " " + surname }} !</p>
 
     <label>
-        Szerokość<input id="width" type="number" min="1" max="50" value="9">
+        Select all &nbsp<input type="checkbox" v-model="selectAll">
     </label>
+    <table>
+        <tr v-for="product in products">
+            <td>
+                <input type="checkbox" v-model="selected" :value="product.id" number>
+            </td>
+            <td>{{ product.name }}</td>
+        </tr>
+    </table>
 
-    <label>
-        Wysokość<input id="height" type="number" min="1" max="50" value="9">
-    </label>
-
-    <button style="display: inline-block" class="new-game-button" onclick="startGame()">Start new game</button>
+    <button @click="removeLast">Remove last</button>
 </div>
+<script>
+    new Vue({
+        el: '#main',
+        computed: {
+            selectAll: {
+                get: function () {
+                    return this.products ? this.selected.length === this.products.length : false;
+                },
+                set: function (value) {
+                    var selected = [];
+
+                    if (value) {
+                        this.products.forEach(function (user) {
+                            selected.push(user.id);
+                        });
+                    }
+
+                    this.selected = selected;
+                }
+            }
+        },
+        data: {
+            products: [
+                {"id": "1", "name": "apple"},
+                {"id": "2", "name": "bread"},
+                {"id": "3", "name": "butter"},
+                {"id": "4", "name": "salami"},
+                {"id": "5", "name": "pasta"},
+                {"id": "6", "name": "orange"},
+                {"id": "7", "name": "chocolate"},
+                {"id": "8", "name": "pie"},
+                {"id": "9", "name": "milk"},
+                {"id": "10", "name": "nigga"}],
+            selected: [],
+            name: '',
+            surname: ''
+        },
+        methods: {
+            removeLast: function () {
+                this.products.splice(-1, 1)
+            }
+        }
+    })
+</script>
 </body>
 </html>
