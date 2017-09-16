@@ -8,19 +8,6 @@
 </head>
 <body>
 <div id="main">
-    <form class="form-inline">
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input v-model="name" class="form-control" id="name" placeholder="Name">
-        </div>
-        <div class="form-group">
-            <label for="surname">Surname</label>
-            <input v-model="surname" class="form-control" id="surname" placeholder="Surname">
-        </div>
-    </form>
-
-    <p>Siema {{ name + " " + surname }} !</p>
-
     <label>
         Select all &nbsp<input type="checkbox" v-model="selectAll">
     </label>
@@ -28,13 +15,17 @@
         <tr v-for="product in products">
             <td>
                 <label>
-                    <input type="checkbox" v-model="selected" :value="product.id">{{ product.name }}
+                    <input type="checkbox" v-model="selected" :value="product.name">{{ product.name }}
                 </label>
             </td>
         </tr>
     </table>
 
     <button @click="removeLast">Remove last</button>
+    <br>
+    <br>
+    <p>Chosen products: {{selected}}</p>
+
 </div>
 <script>
     new Vue({
@@ -49,7 +40,7 @@
 
                     if (value) {
                         this.products.forEach(function (product) {
-                            selected.push(product.id);
+                            selected.push(product.name);
                         });
                     }
 
@@ -70,8 +61,7 @@
                 {"id": "9", "name": "milk"},
                 {"id": "10", "name": "nigga"}],
             selected: [],
-            name: '',
-            surname: ''
+            checkedProducts: []
         },
         methods: {
             removeLast: function () {
