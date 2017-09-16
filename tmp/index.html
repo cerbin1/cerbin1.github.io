@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Minesweeper</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+</head>
+<body onload="startGame()">
+<div style="width: 50%; margin: 0 auto; text-align: center">
+    <label>
+        Bomby<input id="bombs" type="number" min="1" max="2499" value="10">
+    </label>
+
+    <label>
+        Szerokość<input id="width" type="number" min="1" max="50" value="9">
+    </label>
+
+    <label>
+        Wysokość<input id="height" type="number" min="1" max="50" value="9">
+    </label>
+
+    <button style="display: inline-block" class="new-game-button" onclick="startGame()">Start new game</button>
+</div>
+</body>
+</html>
