@@ -28,10 +28,9 @@
         <tr v-for="product in products">
             <td>
                 <label>
-                    <input type="checkbox" v-model="selected" :value="product.id">
+                    <input type="checkbox" v-model="selected" :value="product.id">{{ product.name }}
                 </label>
             </td>
-            <td>{{ product.name }}</td>
         </tr>
     </table>
 
@@ -49,8 +48,8 @@
                     var selected = [];
 
                     if (value) {
-                        this.products.forEach(function (products) {
-                            selected.push(products.id);
+                        this.products.forEach(function (product) {
+                            selected.push(product.id);
                         });
                     }
 
