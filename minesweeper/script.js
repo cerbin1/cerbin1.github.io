@@ -1,4 +1,4 @@
-var game = {
+let game = {
     numberOfBombs: 0,
     isGameDone: false,
     isFirstClick: true,
@@ -35,32 +35,32 @@ var game = {
         cells: null,
         numberOfFlaggedFields: 0,
         iterateCells: function (callback) {
-            for (var i = 0; i < this.height; i++) {
-                for (var j = 0; j < this.width; j++) {
-                    var cell = this.cells[i][j];
+            for (let i = 0; i < this.height; i++) {
+                for (let j = 0; j < this.width; j++) {
+                    let cell = this.cells[i][j];
                     callback(cell);
                 }
             }
         },
         isWidthProperly: function () {
-            return (this.width >= 1 && this.width <= 50) && (Math.round(this.width) == this.width);
+            return (this.width >= 1 && this.width <= 50) && (Math.round(this.width) === this.width);
         },
         isHeightProperly: function () {
-            return (this.height >= 1 && this.height <= 50) && (Math.round(this.height) == this.height);
+            return (this.height >= 1 && this.height <= 50) && (Math.round(this.height) === this.height);
         },
         bombsConditions: function () {
-            return game.numberOfBombs == Math.round(game.numberOfBombs) && game.numberOfBombs >= 0 && game.numberOfBombs < this.height * this.width;
+            return game.numberOfBombs === Math.round(game.numberOfBombs) && game.numberOfBombs >= 0 && game.numberOfBombs < this.height * this.width;
         },
         countBombsAdjacentToFields: function () {
-            for (var i = 0; i < this.height; i++) {
-                for (var j = 0; j < this.width; j++) {
+            for (let i = 0; i < this.height; i++) {
+                for (let j = 0; j < this.width; j++) {
                     this.isBombAdjacentToField(i, j);
                 }
             }
         },
         isBombAdjacentToField: function (x, y) {
-            for (var i = -1; i < 2; i++) {
-                for (var j = -1; j < 2; j++) {
+            for (let i = -1; i < 2; i++) {
+                for (let j = -1; j < 2; j++) {
                     if (this.isFieldInBoard(x + i, y + j)) {
                         if (this.cells[x + i][y + j].isBomb) {
                             this.incrementNumberOfBombsAdjacentToField(x, y);
@@ -77,7 +77,7 @@ var game = {
         },
 
         countUndiscoveredFields: function () {
-            var numberOfUndiscoveredFields = 0;
+            let numberOfUndiscoveredFields = 0;
 
             this.iterateCells(function (cell) {
                 if (!cell.isBomb && !cell.isDiscovered) {
@@ -89,7 +89,7 @@ var game = {
         }
     }
 };
-var colorsOfNumberOfBombsAdjacentToField = ["blue", "green", "red", "purple", "orange", "yellow", "brown", "pink"];
+let colorsOfNumberOfBombsAdjacentToField = ["blue", "green", "red", "purple", "orange", "yellow", "brown", "pink"];
 
 function startGame() {
     if (game.gameField != null) {
@@ -120,10 +120,10 @@ function startGame() {
 }
 
 function createGameBoard() {
-    var array = [];
-    for (var i = 0; i < game.board.height; i++) {
+    let array = [];
+    for (let i = 0; i < game.board.height; i++) {
         array[i] = [];
-        for (var j = 0; j < game.board.width; j++) {
+        for (let j = 0; j < game.board.width; j++) {
             array[i][j] = getDefaultFieldObject();
         }
     }
@@ -138,7 +138,7 @@ function getDefaultFieldObject() {
         numberOfBombsAdjacent: 0,
         gameField: null,
         changeFieldToBomb: function () {
-            var bombImage = document.createElement("img");
+            let bombImage = document.createElement("img");
             bombImage.setAttribute("class", "sizeOfImage");
             bombImage.src = "bomb.png";
             this.gameField.appendChild(bombImage);
@@ -147,17 +147,17 @@ function getDefaultFieldObject() {
 }
 
 function createBorderTable() {
-    var table = document.createElement("table");
+    let table = document.createElement("table");
     table.setAttribute("id", "game.board");
     game.gameField.appendChild(table);
 
-    for (var i = 0; i < game.board.height; i++) {
-        var row = document.createElement("tr");
+    for (let i = 0; i < game.board.height; i++) {
+        let row = document.createElement("tr");
         row.setAttribute("id", "row" + i.toString());
         table.appendChild(row);
 
-        for (var j = 0; j < game.board.width; j++) {
-            var cell = document.createElement("td");
+        for (let j = 0; j < game.board.width; j++) {
+            let cell = document.createElement("td");
             cell.addEventListener("click", leftMouseClick);
             cell.addEventListener("contextmenu", rightMouseClick);
             cell.dataset.x = i.toString();
@@ -169,15 +169,15 @@ function createBorderTable() {
 }
 
 function plantBombs() {
-    for (var i = 0; i < game.numberOfBombs; i++) {
+    for (let i = 0; i < game.numberOfBombs; i++) {
         plantRandomBomb();
     }
 }
 
 function plantRandomBomb() {
     while (true) {
-        var x = Math.floor(Math.random() * game.board.height);
-        var y = Math.floor(Math.random() * game.board.width);
+        let x = Math.floor(Math.random() * game.board.height);
+        let y = Math.floor(Math.random() * game.board.width);
         if (!game.board.cells[x][y].isBomb) {
             game.board.cells[x][y].isBomb = true;
             break;
@@ -187,9 +187,9 @@ function plantRandomBomb() {
 
 
 function displayAllBombs() {
-    for (var i = 0; i < game.board.height; i++) {
-        for (var j = 0; j < game.board.width; j++) {
-            var cellToChange = game.board.cells[i][j];
+    for (let i = 0; i < game.board.height; i++) {
+        for (let j = 0; j < game.board.width; j++) {
+            let cellToChange = game.board.cells[i][j];
             if (cellToChange.isBomb) {
                 if (cellToChange.isFlag) {
                     cellToChange.gameField.innerHTML = "";
@@ -208,10 +208,10 @@ function leftMouseClick() {
     if (game.isGameDone) {
         game.messageBox.innerHTML = "Rozpocznij nową grę";
     } else {
-        var x = parseInt(this.dataset.x);
-        var y = parseInt(this.dataset.y);
+        let x = parseInt(this.dataset.x);
+        let y = parseInt(this.dataset.y);
 
-        var cell = game.board.cells[x][y];
+        let cell = game.board.cells[x][y];
         if (game.isFirstClick) {
             if (cell.isBomb) {
                 plantRandomBomb();
@@ -231,8 +231,8 @@ function rightMouseClick() {
     if (game.isGameDone) {
         game.messageBox.innerHTML = "Rozpocznij nową grę";
     } else {
-        var x = parseInt(this.dataset.x);
-        var y = parseInt(this.dataset.y);
+        let x = parseInt(this.dataset.x);
+        let y = parseInt(this.dataset.y);
 
         setFlag(game.board.cells[x][y]);
         checkIfPlayerWins();
@@ -275,7 +275,7 @@ function floodFill(x, y) {
         return;
     }
 
-    var cell = game.board.cells[x][y];
+    let cell = game.board.cells[x][y];
 
     if (isEmptyOrDiscovered(cell)) {
         return;
@@ -311,8 +311,8 @@ function fillEmptyField(cell) {
 }
 
 function recursiveFloodFill(x, y) {
-    for (var i = -1; i < 2; i++) {
-        for (var j = -1; j < 2; j++) {
+    for (let i = -1; i < 2; i++) {
+        for (let j = -1; j < 2; j++) {
             floodFill(x + i, y + j);
         }
     }
@@ -327,11 +327,11 @@ function checkIfPlayerWins() {
 }
 
 function winCondition() {
-    return countFlagPoints() == game.numberOfBombs || game.board.countUndiscoveredFields() == 0;
+    return countFlagPoints() === game.numberOfBombs || game.board.countUndiscoveredFields() === 0;
 }
 
 function countFlagPoints() {
-    var numberOfPoints = 0;
+    let numberOfPoints = 0;
     game.board.iterateCells(function (cell) {
         if (cell.isFlag) {
             if (cell.isBomb) {
@@ -349,7 +349,7 @@ function countFlagPoints() {
 }
 
 function allFieldsDiscovered() {
-    var allDiscovered = true;
+    let allDiscovered = true;
     game.board.iterateCells(function (cell) {
         if (!cell.isDiscovered) {
             allDiscovered = false;
@@ -368,7 +368,7 @@ function setFlag(cellToSetFlag) {
         cellToSetFlag.isFlag = false;
         game.board.numberOfFlaggedFields--;
     } else {
-        var flagImage = document.createElement("img");
+        let flagImage = document.createElement("img");
         flagImage.setAttribute("class", "sizeOfImage");
         flagImage.src = "flag.png";
         cellToSetFlag.isFlag = true;
