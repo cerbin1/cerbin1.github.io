@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <title>Organising notes</title>
+</head>
+<body onload="generateList()">
+<div class="container">
+    <div class="col-md-6 offset-md-3">
+        <h1>Organising notes:</h1>
+    </div>
+    <div></div>
+    <div id="list-of-tasks" class="col-md-6 offset-md-3 text-center">
+
+    </div>
+
+</div>
+</body>
+<script type="text/javascript">
+    function generateList() {
+        let listElements = ["Sticky notes", "Google Drive", "Phone notes", "Phone Chrome Tabs", "Empty OneNote Temp"];
+
+        let targetDiv = $('#list-of-tasks');
+        for (let i = 0; i < listElements.length; i++) {
+            let elementId = 'element-id' + i;
+            targetDiv.append($('<h2>').prop('id', elementId).addClass('bg-danger').text(listElements[i]));
+            $('#' + elementId).click(function (e) {
+                $(e.target).removeClass('bg-danger');
+                $(e.target).addClass('bg-success');
+            })
+        }
+    }
+</script>
+</html>
